@@ -33,7 +33,8 @@ class _Rope:
 
     def __iterrope__(self):
         for c in self._children:
-            yield from iter_rope(c)
+            for chunk in iter_rope(c):
+                yield chunk
 
     def __bytes__(self):
         return b''.join(iter_rope(self))
@@ -46,7 +47,8 @@ def iter_rope(rope):
     if iterrope is None:
         yield rope
     else:
-        yield from iterrope()
+        for chunk in iterrope():
+            yield chunk
 
 def rope(*ropables):
     # TODO: optimize, in particular, actually implement rope data structure

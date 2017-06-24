@@ -1,8 +1,8 @@
-[![Build Status](https://travis-ci.org/avakar/grope.svg?branch=master)](https://travis-ci.org/avakar/grope)
-
 # grope
+[![Build Status](https://travis-ci.org/avakar/grope.svg?branch=master)](https://travis-ci.org/avakar/grope)
+[![PyPI](https://img.shields.io/pypi/v/grope.svg)](https://pypi.python.org/pypi/grope)
 
-An implementation of a generalized rope data structure.
+An implementation of a generalized rope data structure for Python.
 
 ## Getting started
 

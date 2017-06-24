@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/avakar/grope.svg?branch=master)](https://travis-ci.org/avakar/grope)
+
 # grope
 
 An implementation of a generalized rope data structure.
@@ -8,7 +10,7 @@ Install from PyPI.
 
     pip install grope
 
-Requires Python 2.7+ and Python 3.0+.
+Requires Python 2.7+ or Python 3.3+.
 
 In the following text, if you're using Python 2.7, replace all references to `bytes` with `str` and
 all references to `str` with `unicode`.

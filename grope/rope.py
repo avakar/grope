@@ -1,4 +1,4 @@
-class rope:
+class rope(object):
     def __new__(cls, *ropables):
         if len(ropables) == 1 and isinstance(ropables[0], rope):
             return ropables[0]

@@ -16,12 +16,19 @@ class IoBlob:
 
     def __getitem__(self, key):
         if not isinstance(key, slice):
-            key = slice(key, key + 1)
-        start, stop, step = key.indices(self._len)
-        if step != 1:
-            raise IndexError('strides are not supported')
+            if key < 0:
+                key = self._len + key
+            if key < 0 or key >= self._len:
+                raise IndexError('index out of bounds')
 
-        return IoBlob(self._file, self._start + start, self._start + stop)
+            self._file.seek(key + self._start, 0)
+            return self._file.read(1)[0]
+        else:
+            start, stop, step = key.indices(self._len)
+            if step != 1:
+                raise IndexError('strides are not supported')
+
+            return IoBlob(self._file, self._start + start, self._start + stop)
 
     def __iterrope__(self):
         if self._len == 0:
@@ -31,11 +38,12 @@ class IoBlob:
 
         read = 0
         while read < self._len:
-            r = self._file.read(self._len - read)
+            chunk = min(2**20, self._len - read)
+            r = self._file.read(chunk)
             if not r:
                 raise IOError('reached eof prematurely')
             yield r
             read += len(r)
 
     def __bytes__(self):
-        return b''.join(rope(self))
+        return bytes(rope(self))

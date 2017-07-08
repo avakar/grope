@@ -23,7 +23,11 @@ def test_empty_leaves():
 
 def test_rope_iteration():
     r = rope('a', 'bc', '', 'd')
-    assert ''.join(r) == 'abcd'
+    assert list(r) == ['a', 'b', 'c', 'd']
+
+def test_rope_chunks():
+    r = rope('a', 'bc', '', 'd')
+    assert ''.join(r.chunks) == 'abcd'
 
 def test_slicing():
     r = rope('abcd', 'efgh')
@@ -51,3 +55,8 @@ def test_idempotence():
     r = rope('test')
     assert rope(r) is r
 
+def test_heterogenous_rope():
+    r = rope('abcd', b'efgh')
+
+    assert r[0] == 'a'
+    assert r[4] == b'e'[0]

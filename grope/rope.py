@@ -8,6 +8,13 @@ class rope(object):
         self._len = sum(len(c) for c in ropables)
         return self
 
+    def __repr__(self):
+        return 'rope({})'.format(', '.join(repr(ch) for ch in self.chunks))
+
+    @property
+    def chunks(self):
+        return self.__iterrope__()
+
     def __len__(self):
         return self._len
 
@@ -48,19 +55,16 @@ class rope(object):
 
             return rope(*parts)
 
-    def __iter__(self):
+    def __iterrope__(self):
         for c in self._children:
             for chunk in _iter_rope(c):
                 yield chunk
 
-    def __iterrope__(self):
-        return self.__iter__()
-
     def __bytes__(self):
-        return b''.join(self)
+        return b''.join(self.chunks)
 
     def __str__(self):
-        return ''.join(self)
+        return ''.join(self.chunks)
 
 def _iter_rope(rope):
     iterrope = getattr(rope, '__iterrope__', None)

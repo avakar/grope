@@ -1,3 +1,3 @@
 from .rope import rope
-from .io import wrap_file, open, write
+from .io import wrap_io, open, write
 from .blob_io import BlobIO

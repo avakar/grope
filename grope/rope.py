@@ -1,7 +1,12 @@
-class _Rope:
-    def __init__(self, children):
-        self._children = children
-        self._len = sum(len(c) for c in children)
+class rope:
+    def __new__(cls, *ropables):
+        if len(ropables) == 1 and isinstance(ropables[0], rope):
+            return ropables[0]
+
+        self = super(rope, cls).__new__(cls)
+        self._children = ropables
+        self._len = sum(len(c) for c in ropables)
+        return self
 
     def __len__(self):
         return self._len
@@ -49,7 +54,3 @@ def iter_rope(rope):
     else:
         for chunk in iterrope():
             yield chunk
-
-def rope(*ropables):
-    # TODO: optimize, in particular, actually implement rope data structure
-    return _Rope(ropables)

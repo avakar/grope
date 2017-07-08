@@ -1,9 +1,9 @@
 from .bytes_io import IoBlob
-from .rope import iter_rope
+from .rope import iter_rope, rope
 
 def wrap_file(file, mode='rb'):
     if 'b' in mode:
-        return IoBlob(file)
+        return rope(IoBlob(file))
 
     raise RuntimeError('unsupported mode (only binary is allowed)')
 

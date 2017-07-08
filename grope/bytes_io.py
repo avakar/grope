@@ -1,8 +1,9 @@
 from .rope import rope
 
 class IoBlob:
-    def __init__(self, file, start=0, stop=None):
+    def __init__(self, file, chunk_size=2**20, start=0, stop=None):
         self._file = file
+        self._chunk_size = chunk_size
         self._start = start
 
         if stop is None:
@@ -10,6 +11,9 @@ class IoBlob:
             self._len = file.tell()
         else:
             self._len = stop - start
+
+    def __repr__(self):
+        return '{!r}[{}:{}]'.format(self._file, self._start, self._start + self._len)
 
     def __len__(self):
         return self._len
@@ -28,7 +32,7 @@ class IoBlob:
             if step != 1:
                 raise IndexError('strides are not supported')
 
-            return IoBlob(self._file, self._start + start, self._start + stop)
+            return IoBlob(self._file, self._chunk_size, self._start + start, self._start + stop)
 
     def __iterrope__(self):
         if self._len == 0:
@@ -38,7 +42,7 @@ class IoBlob:
 
         read = 0
         while read < self._len:
-            chunk = min(2**20, self._len - read)
+            chunk = min(self._chunk_size, self._len - read)
             r = self._file.read(chunk)
             if not r:
                 raise IOError('reached eof prematurely')

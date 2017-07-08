@@ -23,3 +23,10 @@ def test_blob_io():
     chunks = list(blob.chunks)
     assert 1 < len(chunks) < 2**8
 
+def test_blob_io_swap_bytes():
+    fin = six.BytesIO(b'abcdefgh' * 2**18)
+
+    blob = wrap_io(fin)
+    blob = rope(blob[:4], b'x', blob[6:])
+
+    assert bytes(blob[:7]) == b'abcdxgh'

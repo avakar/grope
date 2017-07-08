@@ -4,7 +4,7 @@
 
 An implementation of a generalized rope data structure for Python.
 
-## Getting started
+## Installation
 
 Install from PyPI.
 
@@ -12,77 +12,114 @@ Install from PyPI.
 
 Requires Python 2.7+ or Python 3.3+.
 
-In the following text, if you're using Python 2.7, replace all references to `bytes` with `str` and
-all references to `str` with `unicode`.
+## Getting started
 
-## Ropables
+The library defines a new type object, `rope`. Ropes are efficient concatenations
+of strings. Whereas `s + t` is a linear operation over the length of the strings
+`s` and `t`, constructing the rope `rope(s, t)` is logarithmic.
 
-A set of ropable objects is the largest set such that each object `x` in the set
-
- 1. has a length, i.e. `len(x)` is a valid expression, and
- 2. supports slicing, i.e. `x[a:b]` is a valid expression for integers `a` and `b`.
-
-Ropables of particular interest include `bytes` and `str` objects.
-
-## Ropes
-
-Any sequence of ropables can be strung together to form a rope.
+Otherwise, ropes behave like normal strings, in that they are immutable,
+can be indexed, sliced and iterated over.
 
     from grope import rope
 
-    r = rope('hello, ', 'world')
-    assert str(r) == 'hello, world'
+    r = rope('Tirion', ' ', 'Fordring')
 
-Rope objects have length that is the sum of lengths of constituent parts.
-They also support slicing.
+    assert len(r) == len('Tirion Fordring')
+    assert r[0] == 'T'
+    assert r[5] == 'n'
+    assert r[7] == 'F'
 
-    assert str(r[:5]) == 'hello'
+    assert ''.join(r) == 'Tirion Fordring'
 
-As a consequence, all ropes are also ropables and as such can be strung together
-to form longer ropes.
+    # Equivalent to the previous expression, but faster
+    assert str(r) == 'Tirion Fordring'
 
-    r2 = rope(r[:5], ', cruel', r[6:])
-    assert str(r2) == 'hello, cruel world'
+When we say *string*, we actually mean any object `s` that
 
-Unlike builtin strings, ropes are fast to concatenate.
+  * is immutable,
+  * has a length (`len(s)`),
+  * can be sliced without stride (`s[i:j]`),
+  * optionally can be indexed (`s[i]`), and
+  * optionally can be iterated over.
 
-    s1 = 'some long string... ... ...'
-    s2 = 'another long string ... ...'
+Such objects include those of type `str`, `bytes`, `unicode`, and `tuple`.
+Additionally, `rope` objects are also considered strings in this context.
+As such, ropes can be nested.
 
-    # slow; the time complexity is O(len(s))
-    s = s1 + s2
+    r2 = rope(r, " says to put one's faith in the light")
+    assert str(r) == "Tirion Fordring says to put one's faith in the light"
 
-    # fast; the time complexity is O(log(len(s)))
-    r = rope(s1, s2)
+Ropes will only be indexable if all contained strings are indexable. Similarly,
+iteration will only work if the contained strings are iterable.
 
-However, conversion to string can be slow.
+## Rope I/O
 
-    # fast, O(1)
-    print(str(s))
+Any readable file can be converted to a rope using `wrap_io`. The contents
+of the file will not be physically present in memory, instead, they will
+be selectively read from the file on demand.
 
-    # slow, O(len(r))
-    print(str(r))
+You can efficiently (as in with bounded memory requirements) write a rope that
+contains only `bytes` objects with `grope.dump`.
 
-## Walking rope's chunks
+    import grope
+    from grope import rope
 
-Since the conversion of ropes to the builtin string objects is expensive, ropes support fast iteration of its chunks.
+    with open('input.bin', 'rb') as fin:
+        r = grope.wrap_io(fin)
 
-    from grope import iter_rope
+        # recompute checksum at index 0x10
+        chksum = _checksum(rope(r[:0x10], b'\0\0\0\0', r[0x14:]))
+        r = rope(r[:0x10], struct.pack('<I', chksum), r[0x14:])
 
-    for chunk in iter_rope(r):
+        with open('output.bin', 'wb') as fout:
+            grope.dump(r, fout)
+
+## Chunks
+
+Since iterating over a long rope is not efficient, it's better to walk
+along the rope in chunks. Use `chunks` property of ropes to get a chunks generator.
+
+    r = rope('long', 'strings')
+    for chunk in r.chunks:
         sys.stdout.write(chunk)
 
-Usually, large conversions can be avoided using `iter_rope`, since usually, ropes are ultimately written into a stream.
-As this is such a common scenario, there is a helper function.
+Note that a rope may mere 
 
-    from grope import write
-    write(sys.stdout, r)
+By default, a wrapped file will be split into chunks of about 1MB in size.
+You can set the size of the chunk by passing a parameter to `wrap_io`.
 
-## Ropes over `bytes` and `str`
+## Blobs
 
-As a convenience, `iter_rope` also accepts `bytes` and `str` objects and yield a sequence of length 1. Furthermore,
-all ropes in the package support a conversion to `bytes` and `str`.
+A blob is either
 
-    assert str(r) == ''.join(iter_rope(r))
+  * an object of type `bytes` (or `str` in Python 2.7), or
+  * a rope consisting only of `bytes` (again, or `str`) objects.
 
-Of course, the conversion is only valid if all parts of the rope are of the appropriate type.
+Notice that slicing a blob will again produce a blob, indexing a blob
+will produce the appropriate element and calling `bytes` on a blob
+will create the appropriate `bytes` object.
+
+It's easier to write functions that accept blobs rather than readable files.
+Consider a function that parses a Windows .exe file.
+
+    def parse_pe(blob):
+        hdr_offs, = struct.unpack('<H', bytes(blob[0x3c:0x3e]))
+
+        # ...
+
+        for section in sections:
+            section.content = blob[section.offset:section.offset + section.size]
+
+        return PeFile(hdr, sections)
+
+The function will be efficient whether you pass a `bytes` object or a wrapped file.
+Similarly, instead of serializing to a writable file, return blobs.
+
+    def save_pe(pe_file):
+        r = [serialize_hdr(pe_file.hdr)]
+
+        for section in pe_file.sections:
+            r.append(section.content)
+
+        return rope(*r)

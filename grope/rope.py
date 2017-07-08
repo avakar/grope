@@ -9,7 +9,7 @@ class rope(object):
         return self
 
     def __repr__(self):
-        return 'rope({})'.format(', '.join(repr(ch) for ch in self.chunks))
+        return 'rope({})'.format(', '.join(repr(ch) for ch in self._children))
 
     @property
     def chunks(self):

@@ -1,5 +1,5 @@
 from .bytes_io import IoBlob
-from .rope import iter_rope, rope
+from .rope import rope
 
 def wrap_file(file, mode='rb'):
     if 'b' in mode:
@@ -11,6 +11,6 @@ def open(name, mode):
     file = open(name, mode)
     return wrap_file(file, mode)
 
-def write(fout, rope):
-    for chunk in iter_rope(rope):
+def write(fout, ropelike):
+    for chunk in rope(ropelike):
         fout.write(chunk)

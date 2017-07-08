@@ -1,4 +1,4 @@
-from .rope import iter_rope
+from .rope import rope
 
 class IoBlob:
     def __init__(self, file, start=0, stop=None):
@@ -38,4 +38,4 @@ class IoBlob:
             read += len(r)
 
     def __bytes__(self):
-        return b''.join(iter_rope(self))
+        return b''.join(rope(self))

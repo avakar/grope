@@ -13,41 +13,56 @@ class rope(object):
 
     def __getitem__(self, key):
         if not isinstance(key, slice):
-            key = slice(key, key + 1)
-        start, stop, step = key.indices(self._len)
-        if step != 1:
-            raise RuntimeError('strides are not supported')
+            if key < 0:
+                key = len(self) + key
 
-        size = stop - start
+            if key < 0 or key >= len(self):
+                raise IndexError('index out of bounds')
 
-        parts = []
+            for child in self._children:
+                if key >= len(child):
+                    key -= len(child)
+                    continue
+
+                return child[key]
+        else:
+            start, stop, step = key.indices(self._len)
+            if step != 1:
+                raise RuntimeError('strides are not supported')
+
+            size = stop - start
+
+            parts = []
+            for c in self._children:
+                if len(c) <= start:
+                    start -= len(c)
+                    continue
+
+                if start + size <= len(c):
+                    parts.append(c[start:start + size])
+                    break
+
+                parts.append(c[start:])
+                size -= len(c) - start
+                start = 0
+
+            return rope(*parts)
+
+    def __iter__(self):
         for c in self._children:
-            if len(c) <= start:
-                start -= len(c)
-                continue
-
-            if start + size <= len(c):
-                parts.append(c[start:start + size])
-                break
-
-            parts.append(c[start:])
-            size -= len(c) - start
-            start = 0
-
-        return rope(*parts)
-
-    def __iterrope__(self):
-        for c in self._children:
-            for chunk in iter_rope(c):
+            for chunk in _iter_rope(c):
                 yield chunk
 
+    def __iterrope__(self):
+        return self.__iter__()
+
     def __bytes__(self):
-        return b''.join(iter_rope(self))
+        return b''.join(self)
 
     def __str__(self):
-        return ''.join(iter_rope(self))
+        return ''.join(self)
 
-def iter_rope(rope):
+def _iter_rope(rope):
     iterrope = getattr(rope, '__iterrope__', None)
     if iterrope is None:
         yield rope

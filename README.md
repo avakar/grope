@@ -123,3 +123,12 @@ Similarly, instead of serializing to a writable file, return blobs.
             r.append(section.content)
 
         return rope(*r)
+
+## BlobIO
+
+Akin to `StringIO` and `BytesIO`, `BlobIO` turns a blob into a readable file-like
+object.
+
+    blob = rope(b'hello', b', ', b'world')
+    io = grope.BlobIO(blob)
+    assert io.read() == b'hello, world'

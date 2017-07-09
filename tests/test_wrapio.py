@@ -1,5 +1,5 @@
 from grope import rope, wrap_io
-import six
+import six, grope
 
 def test_blob_io():
     fin = six.BytesIO(b'abcdefgh' * 2**18)
@@ -30,3 +30,20 @@ def test_blob_io_swap_bytes():
     blob = rope(blob[:4], b'x', blob[6:])
 
     assert bytes(blob[:7]) == b'abcdxgh'
+
+def test_bytes_dump():
+    r = b'abcdejklfghi'
+
+    fout = six.BytesIO()
+    grope.dump(r, fout)
+
+    assert fout.getvalue() == b'abcdejklfghi'
+
+def test_rope_dump():
+    r = rope(b'abcd', b'efgh', b'ijkl')
+    r = rope(r[:5], r[9:], r[5:9])
+
+    fout = six.BytesIO()
+    grope.dump(r, fout)
+
+    assert fout.getvalue() == b'abcdejklfghi'

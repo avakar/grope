@@ -5,7 +5,7 @@ from setuptools import setup
 
 setup(
     name='grope',
-    version='0.1',
+    version='1.0.0',
 
     description='Generalized rope data structure',
     author='Martin Vejnár',

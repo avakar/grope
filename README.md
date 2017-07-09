@@ -1,6 +1,7 @@
 # grope
 [![Build Status](https://travis-ci.org/avakar/grope.svg?branch=master)](https://travis-ci.org/avakar/grope)
 [![PyPI](https://img.shields.io/pypi/v/grope.svg)](https://pypi.python.org/pypi/grope)
+[![Coverage Status](https://coveralls.io/repos/github/avakar/grope/badge.svg?branch=master)](https://coveralls.io/github/avakar/grope?branch=master)
 
 An implementation of a generalized rope data structure for Python.
 

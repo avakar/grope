@@ -41,7 +41,7 @@ def _concat(lhs, lhs_height, rhs, rhs_height):
             return _concat(RopeNode(*lhs.children[:-1]), lhs_height, rhs, rhs_height)
 
         assert lhs_height== rhs_height + 1
-        lhs = RopeNode(*lhs.children[:-1], rhs)
+        lhs = RopeNode(*(lhs.children[:-1] + (rhs,)))
         return lhs, lhs_height
 
 def _slice_left(node, height, idx):
@@ -62,7 +62,7 @@ def _slice_right(node, height, idx):
         if len(ch) < idx:
             idx -= len(ch)
         elif height == 0:
-            return RopeNode(*node.children[:i], ch[:idx]), 0
+            return RopeNode(*(node.children[:i] + (ch[:idx],))), 0
         else:
             new_node, new_height = _slice_right(ch, height - 1, idx)
             if i == len(node.children) - 1:

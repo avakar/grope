@@ -1,10 +1,14 @@
 from grope import rope
-import pytest
+import pytest, string
 
 def test_empty_rope():
     r = rope()
     assert isinstance(r, rope)
     assert len(r) == 0
+
+def test_rope_repr():
+    r = rope('a')
+    assert repr(r) == "rope('a')"
 
 def test_singleton_rope():
     r = rope('a')
@@ -53,10 +57,16 @@ def test_indexing():
 
 def test_idempotence():
     r = rope('test')
-    assert rope(r) is r
+    assert rope(r)._root is r._root
 
 def test_heterogenous_rope():
     r = rope('abcd', b'efgh')
 
     assert r[0] == 'a'
     assert r[4] == b'e'[0]
+
+def test_balancing():
+    r = rope(*string.ascii_lowercase)
+    assert str(r) == string.ascii_lowercase
+
+    assert r._height <= 5

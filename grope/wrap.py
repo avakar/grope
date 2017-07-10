@@ -21,11 +21,7 @@ class _FileWrap:
 
     def __getitem__(self, key):
         if not isinstance(key, slice):
-            if key < 0:
-                key = self._len + key
-            if key < 0 or key >= self._len:
-                raise IndexError('index out of bounds')
-
+            assert 0 <= key < self._len
             self._file.seek(key + self._start, 0)
             return self._file.read(1)[0]
         else:
@@ -34,8 +30,7 @@ class _FileWrap:
             return _FileWrap(self._file, self._chunk_size, self._start + start, self._start + stop)
 
     def __iterrope__(self):
-        if self._len == 0:
-            return
+        assert self._len
 
         self._file.seek(self._start, 0)
 

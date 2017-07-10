@@ -5,11 +5,15 @@ def test_empty_wrap():
     fin = six.BytesIO(b'')
     blob = wrap_io(fin)
 
-    assert repr(blob)
-
     assert len(blob) == 0
     assert bytes(blob) == b''
     assert not list(blob.chunks)
+
+def test_repr():
+    fin = six.BytesIO(b'abcd')
+    blob = wrap_io(fin)
+
+    assert repr(blob)
 
 def test_indexes():
     fin = six.BytesIO(b'abcdefgh')

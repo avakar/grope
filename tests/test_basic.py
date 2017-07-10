@@ -6,12 +6,9 @@ def test_empty_rope():
     assert isinstance(r, rope)
     assert len(r) == 0
 
-def test_rope_repr():
-    r = rope('a')
-    assert repr(r) == "rope('a')"
-
 def test_singleton_rope():
     r = rope('a')
+    assert repr(r) == "rope('a')"
     assert isinstance(r, rope)
     assert len(r) == 1
 
@@ -57,7 +54,7 @@ def test_indexing():
 
 def test_idempotence():
     r = rope('test')
-    assert rope(r)._root is r._root
+    assert rope(r)._tree is r._tree
 
 def test_heterogenous_rope():
     r = rope('abcd', b'efgh')
@@ -68,8 +65,6 @@ def test_heterogenous_rope():
 def test_balancing():
     r = rope(*string.ascii_lowercase)
     assert str(r) == string.ascii_lowercase
-
-    assert r._height <= 5
 
 if sys.version_info.major == 2:
     def test_unicode_conversion():

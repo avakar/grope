@@ -1,5 +1,53 @@
 from grope import rope, wrap_io
-import six, grope
+import six, grope, pytest
+
+def test_empty_wrap():
+    fin = six.BytesIO(b'')
+    blob = wrap_io(fin)
+
+    assert repr(blob)
+
+    assert len(blob) == 0
+    assert bytes(blob) == b''
+    assert not list(blob.chunks)
+
+def test_indexes():
+    fin = six.BytesIO(b'abcdefgh')
+    blob = wrap_io(fin)
+
+    assert len(blob) == 8
+    assert blob[0] == b'a'[0]
+    assert blob[7] == b'h'[0]
+    assert blob[-1] == b'h'[0]
+    assert blob[-8] == b'a'[0]
+
+    with pytest.raises(IndexError):
+        blob[8]
+
+    with pytest.raises(IndexError):
+        blob[-9]
+
+def test_slices():
+    fin = six.BytesIO(b'abcdefgh')
+    blob = wrap_io(fin)
+
+    assert len(blob[2:6]) == 4
+    assert bytes(blob[2:6]) == b'cdef'
+
+    with pytest.raises(IndexError):
+        blob[2:6:2]
+
+def test_moving_target():
+    fin = six.BytesIO(b'abcdefgh')
+    blob = wrap_io(fin)
+
+    assert len(blob) == 8
+
+    fin.seek(4)
+    fin.truncate()
+
+    with pytest.raises(IOError):
+        bytes(blob)
 
 def test_blob_io():
     fin = six.BytesIO(b'abcdefgh' * 2**18)

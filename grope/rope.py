@@ -117,7 +117,7 @@ class rope(object):
         else:
             start, stop, step = key.indices(len(self))
             if step != 1:
-                raise RuntimeError('strides are not supported')
+                raise IndexError('strides are not supported')
 
             root = self._root
             height = self._height

@@ -147,3 +147,6 @@ class rope(object):
 
     def __str__(self):
         return ''.join(self.chunks)
+
+    def __unicode__(self):
+        return u''.join(self.chunks)

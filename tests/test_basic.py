@@ -1,5 +1,5 @@
 from grope import rope
-import pytest, string
+import pytest, string, sys
 
 def test_empty_rope():
     r = rope()
@@ -70,3 +70,8 @@ def test_balancing():
     assert str(r) == string.ascii_lowercase
 
     assert r._height <= 5
+
+if sys.version_info.major == 2:
+    def test_unicode_conversion():
+        r = rope(u'abcd', u'efgh')
+        assert unicode(r) == u'abcdefgh'

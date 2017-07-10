@@ -7,3 +7,5 @@ __pycache__/
 .tox/
 .coverage
 **.sln
+**.pyproj
+.vs/

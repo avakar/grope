@@ -131,7 +131,7 @@ def _slice_right(node, height, idx):
             return Node(node.children[:i] + (ch[:idx],)), 0
         else:
             new_node, new_height = _slice_right(ch, height - 1, idx)
-            if i == len(node.children) - 1:
+            if i == 0:
                 return new_node, new_height
             else:
                 return _concat(Node(node.children[:i]), height, new_node, new_height)

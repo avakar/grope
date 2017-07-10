@@ -30,7 +30,9 @@ def _is_consistent(tree):
     return all(len(ch.children) >= _pbt.arity // 2 and _is_consistent((ch, height - 1)) for ch in root.children)
 
 def _make_pbt(levels):
-    chunks = _pbt.arity**levels
+    return _make_pbt2(_pbt.arity**levels)
+
+def _make_pbt2(chunks):
     tree = _pbt.build_pbt([Range(i*100, (i + 1)*100) for i in six.moves.range(chunks)])
     assert _is_consistent(tree)
     return tree, Range(0, chunks*100)
@@ -73,6 +75,31 @@ def test_slice2():
     assert _is_consistent(t)
     assert _collate(t) == (r2,)
 
+def test_slice3():
+    t1, r1 = _make_pbt2(_pbt.arity * 2)
+
+    t2, r2 = _make_pbt2(_pbt.arity * (_pbt.arity // 2 + 1))
+    t3, r3 = _make_pbt2(_pbt.arity * (_pbt.arity // 2 + 1))
+
+    t4 = _pbt.concat((t2, t3))
+
+    t5 = _pbt.concat((t1, t4))
+    assert _is_consistent(t5)
+    assert _collate(t5) == (r1, r2, r3)
+
+    t6 = _pbt.concat((t4, t1))
+    assert _is_consistent(t6)
+    assert _collate(t6) == (r2, r3, r1)
+
+def test_slice4():
+    t1, r1 = _make_pbt(4)
+
+    r2 = Range(r1.start + 51100, r1.stop)
+
+    t = _pbt.slice(t1, r2.start, r2.stop)
+    assert _is_consistent(t)
+    assert _collate(t) == (r2,)
+
 def test_index():
     t1, r1 = _make_pbt(4)
     assert _pbt.index(t1, 1234) == 1234
@@ -80,15 +107,6 @@ def test_index():
 def test_concat():
     t1, r1 = _make_pbt(4)
     t2, r2 = _make_pbt(3)
-
-    tree = _pbt.concat((t1, t2))
-
-    assert _is_consistent(tree)
-    assert _collate(tree) == (r1, r2)
-
-def test_concat2():
-    t1, r1 = _make_pbt(4)
-    t2, r2 = _make_pbt(2)
 
     tree = _pbt.concat((t1, t2))
 

@@ -25,28 +25,29 @@ def iter_leaves(tree):
 def _concat(lhs, lhs_height, rhs, rhs_height):
     if lhs_height == rhs_height:
         new_children = lhs.children + rhs.children
-        if len(new_children) <= arity:
+        ch_count = len(new_children)
+        if ch_count <= arity:
             return Node(new_children), lhs_height
         else:
-            ch1 = Node(new_children[:arity//2])
-            ch2 = Node(new_children[arity//2:])
+            ch1 = Node(new_children[:ch_count//2])
+            ch2 = Node(new_children[ch_count//2:])
 
             return Node((ch1, ch2)), lhs_height + 1
     elif lhs_height < rhs_height:
-        lhs, lhs_height = _concat(lhs, lhs_height, rhs.children[0], rhs_height - 1)
-        if lhs_height == rhs_height:
-            return _concat(lhs, lhs_height, Node(rhs.children[1:]), rhs_height)
+        new, new_height = _concat(lhs, lhs_height, rhs.children[0], rhs_height - 1)
+        if new_height == rhs_height:
+            return _concat(new, new_height, Node(rhs.children[1:]), rhs_height)
 
-        assert lhs_height + 1 == rhs_height
-        rhs = Node((lhs,) + rhs.children[1:])
+        assert new_height + 1 == rhs_height
+        rhs = Node((new,) + rhs.children[1:])
         return rhs, rhs_height
     else:
-        rhs, rhs_height = _concat(lhs.children[-1], lhs_height - 1, rhs, rhs_height)
-        if lhs_height == rhs_height:
-            return _concat(Node(lhs.children[:-1]), lhs_height, rhs, rhs_height)
+        new, new_height = _concat(lhs.children[-1], lhs_height - 1, rhs, rhs_height)
+        if lhs_height == new_height:
+            return _concat(Node(lhs.children[:-1]), lhs_height, new, new_height)
 
-        assert lhs_height== rhs_height + 1
-        lhs = Node(lhs.children[:-1] + (rhs,))
+        assert lhs_height == new_height + 1
+        lhs = Node(lhs.children[:-1] + (new,))
         return lhs, lhs_height
 
 def concat(trees):
@@ -115,7 +116,10 @@ def _slice_left(node, height, idx):
         if len(ch) < idx:
             idx -= len(ch)
         elif height == 0:
-            return Node((ch[idx:],) + node.children[i + 1:]), 0
+            if idx == len(ch):
+                return Node(node.children[i + 1:]), 0
+            else:
+                return Node((ch[idx:],) + node.children[i + 1:]), 0
         else:
             new_node, new_height = _slice_left(ch, height - 1, idx)
             if i == len(node.children) - 1:

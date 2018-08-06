@@ -1,4 +1,5 @@
 # grope
+
 [![Build Status](https://travis-ci.org/avakar/grope.svg?branch=master)](https://travis-ci.org/avakar/grope)
 [![PyPI](https://img.shields.io/pypi/v/grope.svg)](https://pypi.python.org/pypi/grope)
 [![Coverage Status](https://coveralls.io/repos/github/avakar/grope/badge.svg?branch=master)](https://coveralls.io/github/avakar/grope?branch=master)
@@ -38,11 +39,11 @@ can be indexed, sliced and iterated over.
 
 When we say *string*, we actually mean any object `s` that
 
-  * is immutable,
-  * has a length (`len(s)`),
-  * can be sliced without stride (`s[i:j]`),
-  * optionally can be indexed (`s[i]`), and
-  * optionally can be iterated over.
+* is immutable,
+* has a length (`len(s)`),
+* can be sliced without stride (`s[i:j]`),
+* optionally can be indexed (`s[i]`), and
+* optionally can be iterated over.
 
 Such objects include those of type `str`, `bytes`, `unicode`, and `tuple`.
 Additionally, `rope` objects are also considered strings in this context.
@@ -85,8 +86,6 @@ along the rope in chunks. Use `chunks` property of ropes to get a chunks generat
     for chunk in r.chunks:
         sys.stdout.write(chunk)
 
-Note that a rope may mere 
-
 By default, a wrapped file will be split into chunks of about 1MB in size.
 You can set the size of the chunk by passing a parameter to `wrap_io`.
 
@@ -94,8 +93,8 @@ You can set the size of the chunk by passing a parameter to `wrap_io`.
 
 A blob is either
 
-  * an object of type `bytes` (or `str` in Python 2.7), or
-  * a rope consisting only of `bytes` (again, or `str`) objects.
+* an object of type `bytes` (or `str` in Python 2.7), or
+* a rope consisting only of `bytes` (again, or `str`) objects.
 
 Notice that slicing a blob will again produce a blob, indexing a blob
 will produce the appropriate element and calling `bytes` on a blob

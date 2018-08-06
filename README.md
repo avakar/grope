@@ -11,7 +11,7 @@ Install from PyPI.
 
     pip install grope
 
-Requires Python 2.7+ or Python 3.3+.
+Requires Python 2.7+ or Python 3.4+.
 
 ## Getting started
 

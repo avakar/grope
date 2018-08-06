@@ -132,7 +132,10 @@ def _slice_right(node, height, idx):
         if len(ch) < idx:
             idx -= len(ch)
         elif height == 0:
-            return Node(node.children[:i] + (ch[:idx],)), 0
+            if idx == 0:
+                return Node(node.children[:i]), 0
+            else:
+                return Node(node.children[:i] + (ch[:idx],)), 0
         else:
             new_node, new_height = _slice_right(ch, height - 1, idx)
             if i == 0:

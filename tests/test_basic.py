@@ -1,6 +1,29 @@
 from grope import rope
 import pytest, string, sys
 
+class _MockString:
+    def __init__(self, start, stop):
+        self.start = start
+        self.stop = stop
+
+    def __len__(self):
+        return self.stop - self.start
+
+    def __getitem__(self, key):
+        if not isinstance(key, slice):
+            if not (-len(self) <= key < len(self)):
+                raise AttributeError('out of bounds')
+            if key < 0:
+                key = len(self) + key
+            return self.start + key
+        else:
+            start, stop, step = key.indices(len(self))
+            assert step == 1
+            return _MockString(self.start + start, self.start + stop)
+
+    def __repr__(self):
+        return '_MockString({}, {})'.format(self.start, self.stop)
+
 def test_empty_rope():
     r = rope()
     assert isinstance(r, rope)
@@ -35,6 +58,23 @@ def test_slicing():
     rr = r[2:6]
     assert len(rr) == 4
     assert str(rr) == 'cdef'
+
+def test_empty_slice():
+    r = rope(_MockString(0, 1000))
+    for ch in r.chunks:
+        assert len(ch) != 0
+
+    rr = r[0:0]
+    for ch in rr.chunks:
+        assert len(ch) != 0
+
+    rr = r[999:999]
+    for ch in rr.chunks:
+        assert len(ch) != 0
+
+    rr = r[1000:1000]
+    for ch in rr.chunks:
+        assert len(ch) != 0
 
 def test_indexing():
     r = rope('abcd', 'efgh')
